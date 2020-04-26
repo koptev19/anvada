@@ -14,18 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-// Создание нового документа
-Route::post('document', 'Api\DocumentController@store');
-
-// Получение одного документа
-Route::get('document/{document}', 'Api\DocumentController@one');
-
-// Обновление документа
-Route::patch('document/{document}', 'Api\DocumentController@update');
+// Список документов, Создание нового документа, Получение документа, Обновление документа
+Route::resource('document', 'Api\DocumentController', ['only' => ['index', 'store', 'show', 'update']]);
 
 // Опубликование документа
 Route::post('document/{document}/publish', 'Api\DocumentController@publish');
 
-// Список документов с пагинацией
-Route::get('document', 'Api\DocumentController@show');

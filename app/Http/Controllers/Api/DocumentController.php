@@ -1,23 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api;
 
+use App\Document;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-use App\Document;
-
 class DocumentController extends Controller
 {
-
     /**
-     * Возвращает список документов с пагинацией
+     * Display a listing of the document.
      *
-     * @return Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
-	public function show()
-	{
+    public function index()
+    {
 		$perPage = request('perPage', 5);
 		$documents = Document::latest()->paginate($perPage);
 		$response = [
@@ -30,28 +28,16 @@ class DocumentController extends Controller
 		];
 
 		return response()->json($response, 200);
-	}
+    }
 
     /**
-     * Возвращает один документ
+     * Store a newly created document in storage.
      *
-     * @param  Document  $document
-     * @return Document
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-	public function one(Document $document)
-	{
-		return $document;
-	}
-
-    /**
-     * Создает новый документ со статусом 'Черновик' и сохраняет его.
-	 * Возвращает только что созданный документ.
-     *
-     * @param  Illuminate\Http\Request $request
-     * @return Symfony\Component\HttpFoundation\Response
-     */
-	public function store(Request $request)
-	{
+    public function store(Request $request)
+    {
 		$document = new Document;
 		$document->{$document->getKeyName()} = (string) Str::uuid();
 		$document->status = Document::STATUSES['draft'];
@@ -61,18 +47,28 @@ class DocumentController extends Controller
 			'document'   => $document
 		];
 		return response()->json($response, 200);
-	}
+    }
 
     /**
-     * Сохраняет документ, если он черновик. Сохраняется только свойство payload из Request
-	 * В случае, если этого поля нет, то возвращает ошибку 400
+     * Display the document.
      *
-     * @param  Illuminate\Http\Request $request
-     * @param  Document $document
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param  \App\Document  $document
+     * @return \Illuminate\Http\Response
      */
-	public function update(Request $request, Document $document)
-	{
+    public function show(Document $document)
+    {
+		return $document;
+    }
+
+    /**
+     * Update the document in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Document  $document
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Document $document)
+    {
 		$document_input = $request->input('document');
 		if(isset($document_input['payload']))
 		{
@@ -89,14 +85,14 @@ class DocumentController extends Controller
 			'error'   => "Payload doesn`t exist"
 		];
 		return response()->json($response, 400);
-	}
+    }
 
     /**
-     * Опубликовывает документ из черновика.
+     * Publish the document.
      *
-     * @param  Illuminate\Http\Request $request
-     * @param  Document $document
-     * @return Symfony\Component\HttpFoundation\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Document  $document
+     * @return \Illuminate\Http\Response
      */
 	public function publish(Request $request, Document $document)
 	{
@@ -106,5 +102,4 @@ class DocumentController extends Controller
 		];
 		return response()->json($response, 200);
 	}
-
 }
